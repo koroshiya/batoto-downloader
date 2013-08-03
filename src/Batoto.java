@@ -1,5 +1,7 @@
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 
 import javax.swing.JButton;
@@ -17,6 +19,7 @@ public class Batoto extends JFrame {
 	
 	private JTextArea textInput;
 	private JTextField textEntry;
+	private JPanel panel;
 	private JButton[] buttons = new JButton[5];
 
 	public static final String parseAll = "Parse All";
@@ -24,6 +27,16 @@ public class Batoto extends JFrame {
 	public static final String clearAll = "Clear All";
 	public static final String clearFirst = "Clear First";
 	public static final String add = "Add";
+	
+	public Batoto(){
+		this(System.getProperty("user.home"));
+	}
+	
+	public Batoto(String home){
+		setHome(home);
+		instantiateGUI();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
 	
 	public void setHome(String home){
 		this.home = home;
@@ -35,15 +48,19 @@ public class Batoto extends JFrame {
 
 	public void instantiateGUI(){
 		
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		
 		textInput = new JTextArea();
 		textInput.setEditable(false);
 		JPanel panelTop = new JPanel();
 		this.setLayout(new FlowLayout());
 		this.setMinimumSize(new Dimension(550, 400));
 		this.setResizable(false);
-		textInput.setMinimumSize(new Dimension(400, 300));
-		textInput.setPreferredSize(new Dimension(400, 300));
-		this.add(new JScrollPane(textInput));
+		panel.setMinimumSize(new Dimension(400, 300));
+		panel.setPreferredSize(new Dimension(400, 300));
+		panel.add(new JScrollPane(textInput), BorderLayout.CENTER);
+		this.add(panel);
 		
 		JPanel rightPane = new JPanel();
 		rightPane.setLayout(new GridLayout(4, 0));
@@ -166,6 +183,14 @@ public class Batoto extends JFrame {
 		this.validate();
 		this.invalidate();
 		
+	}
+	
+	@Override
+	public void paint(Graphics g){
+		super.paint(g);
+		panel.repaint();
+		panel.invalidate();
+		panel.updateUI();
 	}
 	
 }

@@ -48,6 +48,9 @@ public class URLParser {
 
 	public static boolean downloadFromURL(String oldPath, String home){
 		if (!oldPath.endsWith("/") && !oldPath.endsWith("/1")){oldPath = oldPath + "/1";}
+		if (!(oldPath.startsWith("http://") || oldPath.startsWith("https://"))){
+			return false;
+		}
 		/**
 		*TODO: Use regex for "///d{1,*}$/"
 		*TODO: Lock newDir
