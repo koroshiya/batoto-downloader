@@ -22,17 +22,17 @@ public class ButtonListener implements ActionListener{
 			JButton btn = (JButton) obj;
 			String command = btn.getText();
 			
-			if (command.equals(Batoto.add)){
+			if (command.equals(Batoto.commands[4])){
 				parent.add();
-			}else if (command.equals(Batoto.clearAll)){
+			}else if (command.equals(Batoto.commands[2])){
 				parent.clearAll();
-			}else if (command.equals(Batoto.clearFirst)){
+			}else if (command.equals(Batoto.commands[3])){
 				parent.clearFirst();
-			}else if (command.equals(Batoto.parseAll)){
+			}else if (command.equals(Batoto.commands[0])){
 				parent.setEnabled(false);
 				parent.parseAll();
 				parent.setEnabled(true);
-			}else if (command.equals(Batoto.parseFirst)){
+			}else if (command.equals(Batoto.commands[1])){
 				parent.setEnabled(false);
 				parent.parseFirst();
 				parent.setEnabled(true);

@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -21,12 +20,7 @@ public class Batoto extends JFrame {
 	private JTextField textEntry;
 	private JPanel panel;
 	private JButton[] buttons = new JButton[5];
-
-	public static final String parseAll = "Parse All";
-	public static final String parseFirst = "Parse First";
-	public static final String clearAll = "Clear All";
-	public static final String clearFirst = "Clear First";
-	public static final String add = "Add";
+	public static final String[] commands = {"Parse All", "Parse First", "Clear All", "Clear First", "Add"};
 	
 	public Batoto(){
 		this(System.getProperty("user.home"));
@@ -59,7 +53,7 @@ public class Batoto extends JFrame {
 		this.setResizable(false);
 		panel.setMinimumSize(new Dimension(400, 300));
 		panel.setPreferredSize(new Dimension(400, 300));
-		panel.add(new JScrollPane(textInput), BorderLayout.CENTER);
+		panel.add(new BScrollPane(textInput), BorderLayout.CENTER);
 		this.add(panel);
 		
 		JPanel rightPane = new JPanel();
@@ -68,17 +62,14 @@ public class Batoto extends JFrame {
 		
 		ButtonListener listener = new ButtonListener(this);
 		
-		buttons[0] = setJButton(parseAll, listener);
-		buttons[1] = setJButton(parseFirst, listener);
-		buttons[2] = setJButton(clearAll, listener);
-		buttons[3] = setJButton(clearFirst, listener);
-		buttons[4] = setJButton(add, listener);
-		textEntry = new JTextField(36);
+		for (int i = 0; i < buttons.length; i++){
+			buttons[i] = setJButton(commands[i], listener);
+			if (i < buttons.length - 1){
+				rightPane.add(buttons[i]);
+			}
+		}
 		
-		rightPane.add(buttons[0]);
-		rightPane.add(buttons[1]);
-		rightPane.add(buttons[2]);
-		rightPane.add(buttons[3]);
+		textEntry = new JTextField(36);
 		
 		this.add(rightPane);
 		this.add(panelTop);
@@ -191,6 +182,7 @@ public class Batoto extends JFrame {
 		panel.repaint();
 		panel.invalidate();
 		panel.updateUI();
+		textInput.updateUI();
 	}
 	
 }
