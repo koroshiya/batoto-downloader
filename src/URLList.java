@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -32,6 +35,30 @@ public class URLList {
 		}
 		
 		return urls;
+	}
+	
+	public StringBuffer loadList(String filePath){
+		try {
+			return loadFile(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new StringBuffer();
+	}
+	
+	private StringBuffer loadFile(String input) throws IOException{
+		BufferedReader br = new BufferedReader(new FileReader(input));
+    	StringBuffer sb = new StringBuffer();
+	    try {
+	        String line;
+
+	        while ((line = br.readLine()) != null) {
+	            sb.append(line+"\n");
+	        }
+	    } finally {
+	        br.close();
+	    }
+	    return sb;
 	}
 	
 }

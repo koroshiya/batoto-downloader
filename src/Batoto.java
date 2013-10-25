@@ -3,13 +3,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Batoto extends JFrame {
 
@@ -24,6 +33,7 @@ public class Batoto extends JFrame {
 	
 	private static final URLList list = new URLList();
 	public static final String[] commands = {"Parse All", "Parse First", "Clear All", "Clear First", "Add"};
+	public static final String[] menuitems = {"Import list from file", "Export list to file"};
 	
 	public Batoto(){
 		this(System.getProperty("user.home"));
@@ -48,6 +58,62 @@ public class Batoto extends JFrame {
 		
 		textInput.setText(buffer.toString());
 		
+	}
+	
+	private void loadURLsFromFile(String filePath){
+		
+		textInput.setText(list.loadList(filePath).toString());
+		
+	}
+	
+	private void loadURLsFromFile(File filePath){
+		
+		loadURLsFromFile(filePath.getAbsolutePath());
+		
+	}
+	
+	private void saveURLsToFile(String filePath){
+		saveURLsToFile(new File(filePath));
+	}
+	
+	private void saveURLsToFile(File filePath){
+		if (filePath.isDirectory()){
+			return;
+		}
+		String[] lines = textInput.getText().split("\\n");
+		
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(filePath, "UTF-16");
+			for (String s : lines){
+				writer.println(s);
+			}
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally{
+			if (writer != null){writer.close();}
+		}
+		
+	}
+	
+	public void openFile(){
+		JFileChooser chooser = new JFileChooser();
+	    FileNameExtensionFilter filter = new FileNameExtensionFilter("Text File", "txt");
+	    chooser.setFileFilter(filter);
+	    int returnVal = chooser.showOpenDialog(this);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	    	loadURLsFromFile(chooser.getSelectedFile());
+	    }
+	}
+	
+	public void saveFile() {
+		JFileChooser chooser = new JFileChooser();
+	    FileNameExtensionFilter filter = new FileNameExtensionFilter("Text File", "txt");
+	    chooser.setFileFilter(filter);
+	    int returnVal = chooser.showSaveDialog(this);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	    	saveURLsToFile(chooser.getSelectedFile());
+	    }
 	}
 	
 	private void saveURLs(){
@@ -101,7 +167,23 @@ public class Batoto extends JFrame {
 			}
 		}
 		
-		textEntry = new JTextField(36);
+		textEntry = new JTextField(35);
+		
+		JMenuBar jmb = new JMenuBar();
+		JMenu menuFile = new JMenu("File");
+		
+		BatotoListener bl = new BatotoListener(this);
+		
+		JMenuItem menuItemImport = new JMenuItem(menuitems[0]);
+		menuItemImport.addActionListener(bl);
+		
+		JMenuItem menuItemExport = new JMenuItem(menuitems[1]);
+		menuItemExport.addActionListener(bl);
+
+		menuFile.add(menuItemImport);
+		menuFile.add(menuItemExport);
+		jmb.add(menuFile);
+		this.setJMenuBar(jmb);
 		
 		this.add(rightPane);
 		this.add(panelTop);
@@ -115,7 +197,7 @@ public class Batoto extends JFrame {
 	private JButton setJButton(String text, ButtonListener listener){
 		JButton btn = new JButton(text);
 		btn.addActionListener(listener);
-		btn.setPreferredSize(new Dimension(110, 25));
+		btn.setPreferredSize(new Dimension(120, 25));
 		return btn;
 	}
 	
@@ -221,5 +303,7 @@ public class Batoto extends JFrame {
 		panel.updateUI();
 		textInput.updateUI();
 	}
+
+	
 	
 }
