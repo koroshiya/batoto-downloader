@@ -3,6 +3,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,6 +21,8 @@ public class Batoto extends JFrame {
 	private JTextField textEntry;
 	private JPanel panel;
 	private JButton[] buttons = new JButton[5];
+	
+	private static final URLList list = new URLList();
 	public static final String[] commands = {"Parse All", "Parse First", "Clear All", "Clear First", "Add"};
 	
 	public Batoto(){
@@ -29,9 +32,38 @@ public class Batoto extends JFrame {
 	public Batoto(String home){
 		setHome(home);
 		instantiateGUI();
+		loadSavedURLs();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
+	private void loadSavedURLs() {
+		
+		StringBuffer buffer = new StringBuffer();
+		ArrayList<String> aList = list.loadList();
+		
+		for (int i = 0; i < aList.size() - 1; i++){
+			buffer.append(aList.get(i)+"\n");
+		}
+		buffer.append(aList.get(aList.size()-1));
+		
+		textInput.setText(buffer.toString());
+		
+	}
+	
+	private void saveURLs(){
+		
+		String[] lines = textInput.getText().split("\\n");
+		ArrayList<String> remaining = new ArrayList<String>();
+		
+		for (String s : lines){
+			if (!URLParser.downloadFromURL(s, home)){
+				remaining.add(s);
+			}
+		}
+		
+		list.saveList(remaining);
+	}
+
 	public void setHome(String home){
 		this.home = home;
 	}
@@ -98,6 +130,7 @@ public class Batoto extends JFrame {
 		
 		textInput.setText(curText);
 		textEntry.setText("");
+		saveURLs();
 	}
 	
 	public void parseFirst(){
@@ -118,6 +151,7 @@ public class Batoto extends JFrame {
 		}
 		
 		textInput.setText(remaining.toString());
+		saveURLs();
 		
 	}
 	
@@ -134,6 +168,7 @@ public class Batoto extends JFrame {
 		}
 		
 		textInput.setText(remaining.toString());
+		saveURLs();
 		
 	}
 	
@@ -153,11 +188,13 @@ public class Batoto extends JFrame {
 		}
 		
 		textInput.setText(remaining.toString());
+		saveURLs();
 		
 	}
 	
 	public void clearAll(){
 		textInput.setText("");
+		saveURLs();
 	}
 	
 	public void setEnabled(boolean enabled){
