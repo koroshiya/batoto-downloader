@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 public class URLParser {
 	
 	private final static int BUFFER = 4096;
+	private final static boolean FAILSAFE = true;
 
 	public static void directDownload(String oldPath, String home){
 		
@@ -72,28 +73,41 @@ public class URLParser {
 		}
 		
 		String regex;
-		try{
-			regex = findFormat(url);
-		}catch (Exception ex){
-			ex.printStackTrace();
-			return false;
-		}
 		boolean boolContinue = true;
 		int i = 1;
-		do{
+		if (FAILSAFE){
+			do{
+				try{
+					regex = findFormat(new URL(AbsoluteFolder(url.toString()) + i), false);
+					Download(new URL(URLDecoder.decode(regex, "UTF-8")), workDir);
+				}catch(Exception e){
+					boolContinue = false;
+				}
+				i++;
+			}while(boolContinue);
+		}else{
 			try{
-				String form = FormatNumber(i, (regex.startsWith("http://img") 
-											|| regex.startsWith("http://eu")) ? 6 : 2);
-				String fmtImg = (regex + form);
-				URL filePath = findExtension(fmtImg, i);
-
-				Download(filePath, workDir);
-				System.out.println("Downloaded file: " + i);
-			}catch(Exception ex){
-				boolContinue = false;
+				regex = findFormat(url, true);
+			}catch (Exception ex){
+				ex.printStackTrace();
+				return false;
 			}
-			i++;
-		}while(boolContinue);
+			do{
+				try{
+					String form = FormatNumber(i, (regex.startsWith("http://img") 
+												|| regex.startsWith("http://eu")) ? 6 : 2);
+					
+					String fmtImg = (regex + form);
+					URL filePath = findExtension(fmtImg, i);
+					Download(filePath, workDir);
+					System.out.println("Downloaded file: " + i);
+				}catch(Exception ex){
+					ex.printStackTrace();
+					boolContinue = false;
+				}
+				i++;
+			}while(boolContinue);
+		}
 		return i != 1;
 	}
 
@@ -125,13 +139,13 @@ public class URLParser {
 			huc.connect();
 			code = huc.getResponseCode();
 		}catch (Exception ex){
-			System.out.println(ex.toString());
+			System.out.println("testURL" + ex.toString());
 		}
 		return code == 404 ? false : true;		
 		
 	}
 
-	private static String findFormat(URL url) throws Exception{
+	private static String findFormat(URL url, boolean dir) throws Exception{
 		
 		url = new URL(URLDecoder.decode(url.toString(), "UTF-16"));
 		URLConnection spoof = url.openConnection();
@@ -159,15 +173,14 @@ public class URLParser {
 				inputLine = inputLine.substring(start);
 				int end = inputLine.indexOf('"');
 				inputLine = inputLine.substring(0, end);
-				System.out.println(inputLine);
-				return AbsoluteFolder(inputLine) + "img";
+				return dir ? AbsoluteFolder(inputLine) + "img" : inputLine;
 			}else if (inputLine.contains("http://arc.batoto.net/comics/2")){
 				int start = inputLine.indexOf("http://");
 				inputLine = inputLine.substring(start);
 				int end = inputLine.indexOf('"');
 				inputLine = inputLine.substring(0, end);
 
-				return AbsoluteFolder(inputLine);
+				return dir ? AbsoluteFolder(inputLine) : inputLine;
 			}
 		}
         in.close();
@@ -175,6 +188,7 @@ public class URLParser {
 	}
 	
 	private static void Download(URL url, String workDir) throws IOException{
+		System.out.println("url: "+url);
 		BufferedInputStream in = new BufferedInputStream(url.openStream());
 		FileOutputStream outStream = new FileOutputStream(workDir + File.separator + LastFileInPath(url.toString()));
 		BufferedOutputStream out = new BufferedOutputStream(outStream);
