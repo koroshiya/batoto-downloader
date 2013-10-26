@@ -47,16 +47,18 @@ public class Batoto extends JFrame {
 	}
 	
 	private void loadSavedURLs() {
-		
-		StringBuffer buffer = new StringBuffer();
+
 		ArrayList<String> aList = list.loadList();
-		
-		for (int i = 0; i < aList.size() - 1; i++){
-			buffer.append(aList.get(i)+"\n");
+		if (aList.size() > 0){
+			StringBuffer buffer = new StringBuffer();
+			
+			for (int i = 0; i < aList.size() - 1; i++){
+				buffer.append(aList.get(i)+"\n");
+			}
+			buffer.append(aList.get(aList.size()-1));
+			
+			textInput.setText(buffer.toString());
 		}
-		buffer.append(aList.get(aList.size()-1));
-		
-		textInput.setText(buffer.toString());
 		
 	}
 	
@@ -122,9 +124,8 @@ public class Batoto extends JFrame {
 		ArrayList<String> remaining = new ArrayList<String>();
 		
 		for (String s : lines){
-			if (!URLParser.downloadFromURL(s, home)){
 				remaining.add(s);
-			}
+			
 		}
 		
 		list.saveList(remaining);
