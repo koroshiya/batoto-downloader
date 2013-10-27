@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -29,7 +30,11 @@ public class Batoto extends JFrame {
 	private JTextArea textInput;
 	private JTextField textEntry;
 	private JPanel panel;
+	private JPanel statusBar;
+	private JLabel status;
 	private JButton[] buttons = new JButton[5];
+	private JMenuBar jmb;
+	//private JButton btnCancel = new JButton("Cancel");
 	
 	private static final URLList list = new URLList();
 	public static final String[] commands = {"Parse All", "Parse First", "Clear All", "Clear First", "Add"};
@@ -122,9 +127,9 @@ public class Batoto extends JFrame {
 		ArrayList<String> remaining = new ArrayList<String>();
 		
 		for (String s : lines){
-			if (!URLParser.downloadFromURL(s, home)){
+			//if (!URLParser.downloadFromURL(s, home)){
 				remaining.add(s);
-			}
+			//}
 		}
 		
 		list.saveList(remaining);
@@ -142,17 +147,23 @@ public class Batoto extends JFrame {
 		
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
+		this.setLayout(new BorderLayout());
 		
 		textInput = new JTextArea();
 		textInput.setEditable(false);
+		textInput.setSize(400, 300);
 		JPanel panelTop = new JPanel();
 		this.setLayout(new FlowLayout());
-		this.setMinimumSize(new Dimension(550, 400));
+		this.setMinimumSize(new Dimension(550, 430));
 		this.setResizable(false);
 		panel.setMinimumSize(new Dimension(400, 300));
 		panel.setPreferredSize(new Dimension(400, 300));
-		panel.add(new BScrollPane(textInput), BorderLayout.CENTER);
-		this.add(panel);
+		panel.add(new BScrollPane(textInput));
+		this.add(panel, BorderLayout.CENTER);
+		statusBar = new JPanel();
+		status = new JLabel();
+		statusBar.add(status);
+		//this.add(statusBar, BorderLayout.SOUTH);
 		
 		JPanel rightPane = new JPanel();
 		rightPane.setLayout(new GridLayout(4, 0));
@@ -169,7 +180,7 @@ public class Batoto extends JFrame {
 		
 		textEntry = new JTextField(35);
 		
-		JMenuBar jmb = new JMenuBar();
+		jmb = new JMenuBar();
 		JMenu menuFile = new JMenu("File");
 		
 		BatotoListener bl = new BatotoListener(this);
@@ -185,10 +196,11 @@ public class Batoto extends JFrame {
 		jmb.add(menuFile);
 		this.setJMenuBar(jmb);
 		
-		this.add(rightPane);
+		this.add(rightPane, BorderLayout.EAST);
 		this.add(panelTop);
 		this.add(textEntry);
 		this.add(buttons[4]);
+		this.add(statusBar);
 		
 		this.setVisible(true);
 		
@@ -218,12 +230,12 @@ public class Batoto extends JFrame {
 	public void parseFirst(){
 		
 		String[] lines = textInput.getText().split("\\n");
-		textInput.setText("");
+		//textInput.setText("");
 		StringBuffer remaining = new StringBuffer();
 		
 		if (lines.length > 0){
 			int i = 0;
-			if (!URLParser.downloadFromURL(lines[i], home)){
+			if (!URLParser.downloadFromURL(lines[i], home, this)){
 				remaining.append(lines[i]);
 			}
 			while(++i < lines.length){
@@ -234,23 +246,27 @@ public class Batoto extends JFrame {
 		
 		textInput.setText(remaining.toString());
 		saveURLs();
+		this.setStatus("Finished");
+		this.setButtonsEnabled(true);
 		
 	}
 	
 	public void parseAll(){
 		
 		String[] lines = textInput.getText().split("\\n");
-		textInput.setText("");
+		//textInput.setText("");
 		StringBuffer remaining = new StringBuffer();
 		
 		for (String s : lines){
-			if (!URLParser.downloadFromURL(s, home)){
+			if (!URLParser.downloadFromURL(s, home, this)){
 				remaining.append(s + "\n");
 			}
 		}
 		
 		textInput.setText(remaining.toString());
 		saveURLs();
+		this.setStatus("Finished");
+		this.setButtonsEnabled(true);
 		
 	}
 	
@@ -279,7 +295,7 @@ public class Batoto extends JFrame {
 		saveURLs();
 	}
 	
-	public void setEnabled(boolean enabled){
+	public void setButtonsEnabled(boolean enabled){
 		
 		for (JButton c : buttons){
 			c.setEnabled(enabled);
@@ -288,7 +304,11 @@ public class Batoto extends JFrame {
 			c.invalidate();
 			c.updateUI();
 		}
+		for (int i = 0; i < jmb.getMenuCount(); i++){
+			jmb.getMenu(i).setEnabled(enabled);
+		}
 		
+		this.jmb.setEnabled(enabled);
 		this.repaint();
 		this.validate();
 		this.invalidate();
@@ -304,6 +324,17 @@ public class Batoto extends JFrame {
 		textInput.updateUI();
 	}
 
+	
+	public void setStatus(String text){
+		this.status.setText(text);
+		this.status.repaint();
+		this.status.validate();
+		this.status.invalidate();
+		this.status.updateUI();
+		this.repaint();
+		this.validate();
+		this.invalidate();
+	}
 	
 	
 }

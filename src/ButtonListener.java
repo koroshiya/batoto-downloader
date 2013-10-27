@@ -29,15 +29,40 @@ public class ButtonListener implements ActionListener{
 			}else if (command.equals(Batoto.commands[3])){
 				parent.clearFirst();
 			}else if (command.equals(Batoto.commands[0])){
-				parent.setEnabled(false);
-				parent.parseAll();
-				parent.setEnabled(true);
+				parent.setButtonsEnabled(false);
+				//parent.parseAll();
+				//parent.setButtonsEnabled(true);
+				ParseThread pt = new ParseThread(true, parent);
+				pt.start();
 			}else if (command.equals(Batoto.commands[1])){
-				parent.setEnabled(false);
-				parent.parseFirst();
-				parent.setEnabled(true);
+				parent.setButtonsEnabled(false);
+				//parent.parseFirst();
+				//parent.setButtonsEnabled(true);
+				ParseThread pt = new ParseThread(true, parent);
+				pt.start();
 			}
 			
+		}
+		
+	}
+	
+	private static class ParseThread extends Thread{
+		
+		private final boolean boolAll;
+		private final Batoto parent;
+		
+		public ParseThread(boolean all, Batoto parent){
+			this.boolAll = all;
+			this.parent = parent;
+		}
+		
+		@Override
+		public void run(){
+			if (this.boolAll){
+				parent.parseAll();
+			}else{
+				parent.parseFirst();
+			}
 		}
 		
 	}

@@ -20,7 +20,7 @@ public class URLParser {
 	private final static int BUFFER = 4096;
 	private final static boolean FAILSAFE = true;
 
-	public static void directDownload(String oldPath, String home){
+	public static void directDownload(String oldPath, String home, Batoto batoto){
 		
 		File newDir = null;
 		
@@ -41,13 +41,13 @@ public class URLParser {
 			System.out.println(fmtImg);
 			URL filePath = findExtension(fmtImg, 0);
 			System.out.println(filePath);
-			Download(filePath, workDir);
+			Download(filePath, workDir, batoto);
 		}catch(Exception ex){
 			return;
 		}	
 	}
 
-	public static boolean downloadFromURL(String oldPath, String home){
+	public static boolean downloadFromURL(String oldPath, String home, Batoto batoto){
 		if (!oldPath.endsWith("/") && !oldPath.endsWith("/1")){oldPath = oldPath + "/1";}
 		if (!(oldPath.startsWith("http://") || oldPath.startsWith("https://"))){
 			return false;
@@ -79,7 +79,7 @@ public class URLParser {
 			do{
 				try{
 					regex = findFormat(new URL(AbsoluteFolder(url.toString()) + i), false);
-					Download(new URL(URLDecoder.decode(regex, "UTF-8")), workDir);
+					Download(new URL(URLDecoder.decode(regex, "UTF-8")), workDir, batoto);
 				}catch(Exception e){
 					boolContinue = false;
 				}
@@ -99,7 +99,7 @@ public class URLParser {
 					
 					String fmtImg = (regex + form);
 					URL filePath = findExtension(fmtImg, i);
-					Download(filePath, workDir);
+					Download(filePath, workDir, batoto);
 					System.out.println("Downloaded file: " + i);
 				}catch(Exception ex){
 					ex.printStackTrace();
@@ -187,8 +187,9 @@ public class URLParser {
 		return null;
 	}
 	
-	private static void Download(URL url, String workDir) throws IOException{
+	private static void Download(URL url, String workDir, Batoto batoto) throws IOException{
 		System.out.println("url: "+url);
+		batoto.setStatus("Downloading: "+url.getFile());
 		BufferedInputStream in = new BufferedInputStream(url.openStream());
 		FileOutputStream outStream = new FileOutputStream(workDir + File.separator + LastFileInPath(url.toString()));
 		BufferedOutputStream out = new BufferedOutputStream(outStream);
